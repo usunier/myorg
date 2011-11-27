@@ -1,6 +1,7 @@
 <?php 
 // M010 anciennement ugeared
 // ce programme permet la modification des titres
+// à terme il devrait être intégré à M008 (ancien ugearaf) en ajax
 require_once('connections/myorg_syno.php'); 
 include('GetSQLValueString.php');
 
