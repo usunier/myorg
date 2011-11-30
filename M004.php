@@ -1,9 +1,16 @@
 <?php 
 // myorg004 programme créé le 06/11/11 dans la version 2012 de MyOrg
+$prog = "M004.php" ;
 // il s'agit d'une liste ordonnée de tout ce qui est à faire
-// 26-11-11 boite qui s'ouvre au survol du libellé
+// liste des modifications
+	// 26-11-11 ajout d'une boite qui s'ouvre au survol du libellé pour afficher la description
+	// 28/11/11 les dates dépassées sont en rouge sur fond jaune pour attirer l'attention
+	// 30/11/11 modificition du pied de page aux normes graphiques de l'application
+// date de la dernière modification
+$dmod = "30/11/11";	
 require_once('connections/myorg_syno.php');
 include('GetSQLValueString.php'); 
+
 
 mysql_select_db($database_myorg_syno, $myorg_syno);
 $query_rq01 = "SELECT * FROM acts ORDER BY ID_act DESC LIMIT 1";
@@ -109,7 +116,7 @@ $totalRows_req01 = mysql_num_rows($req01);
         <td class="ui-state-default" align="center" style="font-size:80%"><?php echo $pri; } ?> </td>
         <td class="ui-state-default" align="center">
         <?php if ($row_req01['dateCre'] < $dat) { ?>
-        <span class="rouge"><?php echo $row_req01['dateCre']; ?></span>
+        <span class="ui-state-error"><?php echo $row_req01['dateCre']; ?></span>
 		<?php } 
 		else { ?>
         <?php echo $row_req01['dateCre']; } ?></td>
@@ -126,10 +133,10 @@ $totalRows_req01 = mysql_num_rows($req01);
             <input type="submit" name="ALLER2" id="ALLER2" value="<?php echo $row_req01['fichier']; ?>" />
         </form></td>
       </tr>
-      <?php } while ($row_req01 = mysql_fetch_assoc($req01)); ?>
-    </table>
-  </div>
-  <p align="center">&copy; XXIs JFU novembre 2011</p>
+      <?php } while ($row_req01 = mysql_fetch_assoc($req01)); 
+//insertion du pied de page
+include('M012.php'); ?>
+</div>
 </div>
 
 </body>
