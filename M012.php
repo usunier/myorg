@@ -1,5 +1,5 @@
 <?php
-// myorg012 programme créé le 30/11/11 dans la version 2012 de MyOrg
+// M012 programme créé le 30/11/11 dans la version 2012 de MyOrg
 // pied de page normalisé
 // liste des modifications
 ?>

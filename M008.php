@@ -1,5 +1,5 @@
 <?php 
-// M004 programme créé le 04/12/11 dans la version 2012 de MyOrg
+// M008 programme créé le 04/12/11 dans la version 2012 de MyOrg
 	$prog = "M008.php" ;
 // il s'agit d'une liste des ACTES DONT LE TITRE de rattachement N'EXISTE PAS
 // liste des modifications
