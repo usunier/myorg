@@ -1,7 +1,6 @@
 <?php 
 /**
  * M014 - ancien programme 'ugeteda' 
- *
  * affichage des actes pour une date donnée
  * liste des modifications
  *		08/12/11 création du programme
@@ -14,11 +13,13 @@
  *		22/12/11 les dates dépassées sont mises en évidence
  *		23/12/11 suppression de toutes références aux programmes 'uge'
  *		23/12/11 le programme est validé en version 1
+ * problèmes non résolus / améliorations à apporter
+ *		24/12/11 l'affichage des descriptions dysfonctionne ; cel ne vient ni des descriptions, ni du scroll
 */
 // nom du programme
 	$prog = "M014.php" ;
 // date de la dernière modification
-	$dmod = "23/12/11";	
+	$dmod = "24/12/11";	
 	
 // connexion à la base de données
 require_once('connections/myorg_syno.php'); 
@@ -165,22 +166,19 @@ messageDate = TabJour[jour] + " " + numero + " " + TabMois[mois] + " " + annee;
             </form></td>
 </tr>
 </table>
-
-<div class="scroll790" style="position:relative; top:20px" >
+<div style="position:relative; top:15px">
 <table width="790" border="1" align="center" cellpadding="1" cellspacing="0" class="ui-corner-all">
 <tr>
-<td class="ui-state-error ui-corner-tl ui-corner-tr" colspan="9" align="center">ACTES DU <?php echo $tit ; ?></td>
+<td class="ui-state-error ui-corner-tl ui-corner-tr" colspan="7" align="center">ACTES DU <?php echo $tit ; ?></td>
 </tr> 
 <tr align="center">
 <td class="ui-state-active" >Libellé</td>
 <td class="ui-state-active" ><span class="hasTip" title="créer un nouvel acte"><a href="M017.php?date=<?php echo $dat; ?>"><img src="images/add16.gif" alt="nouvel acte" border="0" title="cliquer pour cr&eacute;er un nouvel acte" /></a></span></td>
 <td class="ui-state-active" >Type</td>
-<td class="ui-state-active" >Contact</td>
 <td class="ui-state-active" >D&eacute;but</td>
 <td class="ui-state-active" >Fin</td>
 <td class="ui-state-active" >Titre</td>
 <td class="ui-state-active" >Fichier</td>
-<td width="10" class="ui-state-active">&nbsp;</td>
 </tr>
 <?php 
 $P04 = "SELECT * FROM acts WHERE acts.dateCre = '$dat' ORDER BY acts.ID_urgence ASC, acts.heureDeb DESC" ;
@@ -188,9 +186,9 @@ $P04 = "SELECT * FROM acts WHERE acts.dateCre = '$dat' ORDER BY acts.ID_urgence 
 foreach ($db->query($P04) as $R04) { ?>
 <tr>
 <?php $AF4 = "M011.php?id=".$R04['ID_act'] ; ?>
-<td colspan="2"  class="ui-state-default" onclick="window.open('<?php echo $AF4; ?>','_self')"><a href="#" class="info"><?php echo $R04['actLibel']; ?>
+<td colspan="2"  class="ui-state-default" onclick="window.open('<?php echo $AF4; ?>', '_self')"  width="340"><a href="#" class="info"><?php echo substr($R04['actLibel'], 0, 44)."..." ; ?>
 <span><div class="ui-state-active">cliquer pour éditer ou supprimer cet acte<br/></div><?php echo $R04['actDesc']; ?></span></a></td>
-<td class="ui-state-default" align="center">
+<td class="ui-state-default" align="center" width="120" >
 <?php // recherche du libellé du type de l'acte
 $TYR = $R04['ID_typa']; 
 $P05= $db->query("SELECT * FROM type_act WHERE ID_typa = '$TYR'");
@@ -198,21 +196,6 @@ $P05->setFetchMode(PDO::FETCH_OBJ);
 $R05 = $P05->fetch() ;
 $TYP = $R05->typaLibel; 
 echo $TYP ; ?>
-</td>
-<td class="ui-state-default" align="center">
-<?php // recherche du libellé du contact
-// Récupération du premier contact lié à l'acte affiché
-$ID4 = $R04['ID_act'] ;
-$P06= $db->query("SELECT * FROM actqui WHERE ida = '$ID4' ORDER BY id1 LIMIT 1");
-$P06->setFetchMode(PDO::FETCH_OBJ);
-$R06 = $P06->fetch() ;
-$CO6 = $R06->idq;
-// récupération du libellé du contact lié à l'acte affiché
-$P07= $db->query("SELECT * FROM contacts WHERE ID_contact = '$CO6'");
-$P07->setFetchMode(PDO::FETCH_OBJ);
-$R07 = $P07->fetch() ;
-$NO6 = $R07->Nom_complet;
-echo $NO6 ; ?>
 </td>
  <?php 
 $tt = -3600 ;
@@ -222,11 +205,11 @@ $tp = $tf - $td;
 $tt = $tt + $tp;
 $tp = $tf - $td - 3600 ;
 ?>
-<td class="ui-state-default"><div align="center"><?php echo substr($R04['heureDeb'], 0,5); ?></div></td>
+<td class="ui-state-default" width="40" ><div align="center"><?php echo substr($R04['heureDeb'], 0,5); ?></div></td>
 <?php if ($test == $tf) { ?>
-<td class="ui-state-default"><div align="center"><?php echo substr($R04['heureFin'], 0,5); ?></div></td>
+<td class="ui-state-default" width="40" ><div align="center"><?php echo substr($R04['heureFin'], 0,5); ?></div></td>
 <?php } else { ?>
-<td class="ui-state-error"><div align="center"><?php echo substr($R04['heureFin'], 0,5); ?></div></td>
+<td class="ui-state-error" width="40" ><div align="center"><?php echo substr($R04['heureFin'], 0,5); ?></div></td>
 <?php } 
 $test = $td; 
 // récpération du libellé du titre de rattachement de l'acte
@@ -235,22 +218,18 @@ $P08= $db->query("SELECT * FROM titles WHERE id = '$J04'");
 $P08->setFetchMode(PDO::FETCH_OBJ);
 $R08 = $P08->fetch() ;
 $ID8 = $R08->id ;
-$TI8 = $R08->lib ; ?>
-<td class="ui-state-default" align="center"><a href="M018.php?id=<?php echo $ID8 ;?>"><?php echo $TI8 ; ?></a></td>
-<td class="ui-state-default"><form id="boutonG" name="boutonG" method="post" action="documents/<?php echo $R04['fichier']; ?>">
-<div align="center"><input type="submit" name="ALLER3" id="ALLER3" value="<?php echo $R04['fichier']; ?>" />
-</div></form></td>
-<td width="10" class="ui-state-active">&nbsp;</td>
+$TI8 = $R08->lib ; ?> 
+<td class="ui-state-default" width="140" align="center"><a href="M018.php?id=<?php echo $ID8 ;?>"><?php echo $TI8 ; ?></a></td>
+<?php $FIC4 = "documents/".$R04['fichier']; ?>
+<td class="ui-state-default"  width="70" onclick="window.open('<?php echo $FIC4 ; ?>', '_blank')"><?php echo $R04['fichier']; ?> </td>
 </tr>
 <?php } ?>
 </table>
 </div>
-
 <p>&nbsp;</p>
  
 <table width="790" border="1" align="center" cellpadding="1" cellspacing="0" class="ui-corner-all" style="position:relative; top:10px">
 <tr class="ui-state-default">
-<tr>
 <td class="ui-state-error" colspan="8" align="center">A FAIRE TRIE PAR URGENCE</td>
 </tr>  
 <tr>
@@ -258,7 +237,7 @@ $TI8 = $R08->lib ; ?>
 <td class="ui-state-active" align="center"><input type="button" onClick='OuvrirPop("M003.php","sans",100,100,640,300,"menubar=no,scrollbars=no,statusbar=no")' value="cr&eacute;er un acte rapidement"></td>
 <td class="ui-state-active" align="center">Priorit&eacute;</td>
 <td class="ui-state-active" align="center">Date</td>
-<td class="ui-state-active" align="center">Fichier</td>
+<td class="ui-state-active" align="center">Titre</td>
 </tr>
 <?php 
 $P01 = "SELECT * FROM acts WHERE acts.ID_urgence < 6 ORDER BY acts.ID_urgence ASC, acts.dateCre ASC, acts.heureDeb ASC" ;
@@ -266,7 +245,7 @@ $P01 = "SELECT * FROM acts WHERE acts.ID_urgence < 6 ORDER BY acts.ID_urgence AS
 foreach ($db->query($P01) as $R01) { ?>
 <tr>
 <?php $AF1 = "M011.php?id=".$R01['ID_act'] ; ?>
-<td colspan="2"  class="ui-state-default" onclick="window.open('<?php echo $AF1; ?>')"><a href="#" class="info"><?php echo $R01['actLibel']; ?>
+<td colspan="2"  class="ui-state-default" onclick="window.open('<?php echo $AF1; ?>', '_self')"><a href="#" class="info"><?php echo $R01['actLibel']; ?>
 <span><div class="ui-state-active">cliquer pour éditer ou supprimer cet acte<br/></div><?php echo $R01['actDesc']; ?></span></a></td>
 <?php 
 $PRI = $R01['ID_urgence']; $IDA = $R01['ID_act']; $JOB = $R01['ID_job'];
