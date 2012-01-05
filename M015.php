@@ -1,11 +1,15 @@
 <?php 
 /**
  * M015 - ancien programme 'menu' 
- *
  * affichage de la barre de menu horizontale
  * liste des modifications
  *		09/12/11 création du programme
  * 		10/12/11 généralisation PDO	
+ *		04/01/12 suppression référence aux programmes 'uge'
+ *		04/01/12 accès direct à myorg depuis le menu principal
+ *		04/01/12 accès à la comptabilité depuis le menu principal
+ * problèmes non résolus / améliorations à apporter
+ *		uniformisation de la navigation
 */
 require_once('connections/myorg_syno.php'); 
 ?>
@@ -32,7 +36,7 @@ require_once('connections/myorg_syno.php');
 <li><a class="MenuBarItemSubmenu" href="<?php  echo $R01->nav1File ; ?>"><?php echo $R01->nav1Libel ; ?></a>
 
 <?php // test niveau 2
-	if ($par2 <> 2) {
+	if (($par2 < 2) || ($par2 > 3)) {
 	// début de niveau 2 ?>
     <ul>  <?php
 	$Q02 = $db->query("SELECT * FROM nav2 WHERE nav2.ID_nav1 = $par2 ORDER BY nav2.nav2Libel ASC");
@@ -95,14 +99,19 @@ require_once('connections/myorg_syno.php');
 
 <?php } // fin de la navigation if hors 'STRUCTURE' (2)
 
-else {  // navigation dans la 'STRUCTURE' (2)
-	// début du niveau 2 pour la structure ?>
+else {  
+// navigation dans la 'STRUCTURE' (2 et 3)
+if ($par2 == 2) {  // si 2 le système recherche toutes les occurences de la structure
+	$S01 = "niv = 1" ; }
+else {	// si pas 2 (en l'occurence 3) le système recherche les descendants de myorg (72)
+	$S01 = "par = 72" ; }
+// début du niveau 2 pour la structure ?>
 	<ul> <?php
-	$Q22 = $db->query("SELECT * FROM titles WHERE niv = 1 ORDER BY lib ASC"); 
+	$Q22 = $db->query("SELECT * FROM titles WHERE ".$S01." ORDER BY lib ASC"); 
 	$Q22->setFetchMode(PDO::FETCH_OBJ); 
 	while($R22 = $Q22->fetch()){
 	$par2 = $R22->id ; ?>
-<li><a class="MenuBarItemSubmenu" href="<?php  echo "ugearaf.php?id=".$par2; ?>"><?php echo $R22->lib."-".$par2; ?></a>
+<li><a class="MenuBarItemSubmenu" href="<?php  echo "M018.php?id=".$par2; ?>"><?php echo $R22->lib."-".$par2; ?></a>
 
 <?php // début du niveau 3 pour la structure 
 	$C23 = $db->query("SELECT COUNT(*) AS nbe FROM titles WHERE par = $par2");
@@ -114,7 +123,7 @@ else {  // navigation dans la 'STRUCTURE' (2)
 	$Q23->setFetchMode(PDO::FETCH_OBJ);
 	while($R23 = $Q23->fetch()) {
 	$par3 = $R23->id ;  ?>
-<li><a class="MenuBarItemSubmenu" href="<?php  echo "ugearaf.php?id=".$par3; ?>"><?php echo $R23->lib."-".$par3; ?></a>
+<li><a class="MenuBarItemSubmenu" href="<?php  echo "M018.php?id=".$par3; ?>"><?php echo $R23->lib."-".$par3; ?></a>
 
 <?php // début du niveau 4 pour la structure 
 	$C24 = $db->query("SELECT COUNT(*) AS nbe FROM titles WHERE par = $par3");
@@ -126,7 +135,7 @@ else {  // navigation dans la 'STRUCTURE' (2)
 	$Q24->setFetchMode(PDO::FETCH_OBJ);
 	while($R24 = $Q24->fetch()) {
 	$par4 = $R24->id ;  ?>
-<li><a class="MenuBarItemSubmenu" href="<?php  echo "ugearaf.php?id=".$par4; ?>"><?php echo $R24->lib."-".$par4; ?></a>
+<li><a class="MenuBarItemSubmenu" href="<?php  echo "M018.php?id=".$par4; ?>"><?php echo $R24->lib."-".$par4; ?></a>
 
 <?php // début du niveau 5 pour la structure 
 	$C25 = $db->query("SELECT COUNT(*) AS nbe FROM titles WHERE par = $par4");
@@ -138,7 +147,7 @@ else {  // navigation dans la 'STRUCTURE' (2)
 	$Q25->setFetchMode(PDO::FETCH_OBJ);
 	while($R25 = $Q25->fetch()) {
 	$par5 = $R25->id ;  ?>
-<li><a class="MenuBarItemSubmenu" href="<?php  echo "ugearaf.php?id=".$par5; ?>"><?php echo $R25->lib."-".$par5; ?></a>
+<li><a class="MenuBarItemSubmenu" href="<?php  echo "M018.php?id=".$par5; ?>"><?php echo $R25->lib."-".$par5; ?></a>
 
 <?php // début du niveau 6 pour la structure 
 	$C26 = $db->query("SELECT COUNT(*) AS nbe FROM titles WHERE par = $par5");
@@ -150,7 +159,7 @@ else {  // navigation dans la 'STRUCTURE' (2)
 	$Q26->setFetchMode(PDO::FETCH_OBJ);
 	while($R26 = $Q26->fetch()) {
 	$par6 = $R26->id ;  ?>
-<li><a class="MenuBarItemSubmenu" href="<?php  echo "ugearaf.php?id=".$par6; ?>"><?php echo $R26->lib."-".$par6; ?></a>
+<li><a class="MenuBarItemSubmenu" href="<?php  echo "M018.php?id=".$par6; ?>"><?php echo $R26->lib."-".$par6; ?></a>
 
 <?php // début du niveau 7 pour la structure 
 	$C27 = $db->query("SELECT COUNT(*) AS nbe FROM titles WHERE par = $par6");
@@ -162,12 +171,11 @@ else {  // navigation dans la 'STRUCTURE' (2)
 	$Q27->setFetchMode(PDO::FETCH_OBJ);
 	while($R27 = $Q27->fetch()) {
 	$par7 = $R27->id ;  ?>
-<li><a class="MenuBarItemSubmenu" href="<?php  echo "ugearaf.php?id=".$par7; ?>"><?php echo $R27->lib."-".$par7; ?></a>
+<li><a class="MenuBarItemSubmenu" href="<?php  echo "M018.php?id=".$par7; ?>"><?php echo $R27->lib."-".$par7; ?></a>
 
 </li> <?php // fin d'un item de niveau 7 ?>
 <?php } // fin du test ?>
 </ul> <?php } // fin de niveau 7 ?>
-
 
 </li> <?php // fin d'un item de niveau 6 ?>
 <?php } // fin du test ?>
@@ -190,10 +198,11 @@ else {  // navigation dans la 'STRUCTURE' (2)
 <?php } // fin du niveau 2 pour la structure ?>
 </ul>
 
-<?php } // fin du else ?>
-    
-</li> <?php // fin d'un item de niveau 1 ?>  
-<?php } ?>
+<?php } // fin du else   ?>
+   
+</li>   
+<?php // fin d'un item de niveau 1 ?>  
+<?php }  ?>
 </ul> <?php // fin de niveau 1 ?>
 
 <script type="text/javascript">
